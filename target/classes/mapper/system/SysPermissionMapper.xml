@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kakawin.gis.springboot.modules.system.mapper.SysPermissionMapper">
+	<select id="listByUsername" resultType="com.kakawin.gis.springboot.modules.system.entity.SysPermission" parameterType="String">
+		select 
+			tb_sys_permission.*
+		from 
+			tb_sys_permission,tb_sys_role,tb_sys_user,tb_sys_user_role,tb_sys_role_permission
+		where
+			tb_sys_user.username=#{username}
+		and
+			tb_sys_user.id=tb_sys_user_role.user_id
+		and
+			tb_sys_role.id=tb_sys_user_role.role_id
+		and 
+			tb_sys_role.id=tb_sys_role_permission.role_id
+		and 
+			tb_sys_permission.id=tb_sys_role_permission.permission_id
+	</select>
+	
+	<select id="listAvailablePermissionStrings" resultType="String" parameterType="String">
+		select 
+			distinct tb_sys_permission.permission
+		from 
+			tb_sys_permission,tb_sys_role,tb_sys_user,tb_sys_user_role,tb_sys_role_permission
+		where
+			tb_sys_user.username=#{username}
+		and
+			tb_sys_user.id=tb_sys_user_role.user_id
+		and
+			tb_sys_role.id=tb_sys_user_role.role_id
+		and 
+			tb_sys_role.id=tb_sys_role_permission.role_id
+		and 
+			tb_sys_permission.id=tb_sys_role_permission.permission_id
+		and
+		    tb_sys_permission.state='1'
+	</select>
+	
+	<select id="listAllPermissionStrings" resultType="String">
+		select 
+			distinct tb_sys_permission.permission
+		from 
+			tb_sys_permission
+	</select>
+	
+	<select id="listChildrenPermission" resultType="com.kakawin.gis.springboot.modules.system.entity.SysPermission" parameterType="Map">
+		select 
+			 tb_sys_permission.*
+		from 
+			tb_sys_permission
+			<where>
+			1 = 1
+			 <if test="parentId != null and parentId !=''">
+				and tb_sys_permission.parent_id = #{parentId}
+			  </if>
+			   <if test="name != null and name !=''">
+				 and tb_sys_permission.name = #{name}
+			  </if>
+			</where>
+	</select>
+	
+	<select id="listBySysRoleId" resultType="com.kakawin.gis.springboot.modules.system.entity.SysPermission" parameterType="String">
+		select 
+			tb_sys_permission.*
+		from 
+			tb_sys_permission,tb_sys_role_permission
+		where
+			tb_sys_role_permission.role_id=#{sysRoleId}
+		and
+			tb_sys_permission.id=tb_sys_role_permission.permission_id
+	</select>
+	
+	<insert id="insertRolePermissions" parameterType="String">
+		insert into
+			tb_sys_role_permission (id,role_id,permission_id)
+		values
+		<foreach collection="permissionIds" item="permissionId" index="index" separator="," >
+			UUID(),#{roleId},#{permissionId})
+		</foreach>
+	</insert>
+	
+	<delete id="deleteRolePermissions" parameterType="String">
+		delete 
+		from
+			 tb_sys_role_permission
+		where 
+			tb_sys_role_permission.role_id=#{roleId}  or tb_sys_role_permission.permission_id = #{roleId}
+	</delete>
+</mapper>

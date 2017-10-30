@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kakawin.gis.springboot.modules.poi.mapper.PoiMapper">
+	<select id="listByParamMap" parameterType="Map"
+		resultType="com.kakawin.gis.springboot.modules.poi.entity.Poi">
+		SELECT
+			tb_map_poi.*
+		FROM 
+			tb_map_poi
+		<where>
+		<if test="id!=null and id!=''">
+			tb_map_poi.id=#{id}
+		</if>
+		<if test="poiType!=null and poiType!=''">
+			and tb_map_poi.poi_type=#{poiType}
+		</if>
+		<if test="poiCode!=null and poiCode!=''">
+			and tb_map_poi.poi_code like concat(concat('%',#{poiCode}),'%')
+		</if>
+		<if test="poiName!=null and poiName!=''">
+			and tb_map_poi.poi_name like concat(concat('%',#{poiName}),'%')
+		</if>
+		</where>
+	</select>
+	
+	<select id="listFeatureByExtent" parameterType="com.vividsolutions.jts.geom.Polygon"
+		resultType="com.kakawin.gis.springboot.modules.poi.entity.Poi">
+		SELECT
+			p.*
+		FROM
+			tb_map_poi AS p
+		WHERE
+			ST_WITHIN(p.geometry,#{extent}) = 1
+	</select>
+	
+	
+</mapper>

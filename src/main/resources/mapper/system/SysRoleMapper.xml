@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kakawin.gis.springboot.modules.system.mapper.SysRoleMapper">
+	<select id="listByUsername" resultType="com.kakawin.gis.springboot.modules.system.entity.SysRole" parameterType="String">
+		select 
+			tb_sys_role.* 
+		from 
+			tb_sys_role,tb_sys_user,tb_sys_user_role
+		where
+			tb_sys_user.username=#{username}
+		and
+			tb_sys_user.id=tb_sys_user_role.user_id
+		and
+			tb_sys_role.id=tb_sys_user_role.role_id
+	</select>
+	
+	<select id="listByUserId" resultType="com.kakawin.gis.springboot.modules.system.entity.SysRole" parameterType="String">
+		select 
+			tb_sys_role.* 
+		from 
+			tb_sys_role,tb_sys_user_role
+		where
+			tb_sys_user_role.user_id=#{userId}
+		and
+			tb_sys_role.id=tb_sys_user_role.role_id
+	</select>
+	
+	<select id="listAvailableRoleStrings" resultType="String" parameterType="String">
+		select 
+			tb_sys_role.role
+		from 
+			tb_sys_role,tb_sys_user,tb_sys_user_role
+		where
+			tb_sys_user.username=#{username}
+		and
+			tb_sys_user.id=tb_sys_user_role.user_id
+		and
+			tb_sys_role.id=tb_sys_user_role.role_id
+		and
+			tb_sys_role.state='1'
+	</select>
+	
+	<insert id="insertUserRoles" parameterType="String">
+		insert into
+			tb_sys_user_role (id,user_id,role_id)
+		values
+		<foreach collection="roleIds" item="roleId" index="index" separator="," >
+			UUID(),#{userId},#{roleId})
+		</foreach>
+	</insert>
+	<delete id="deleteUserRoles" parameterType="map">
+		delete 
+		from
+			 tb_sys_user_role
+		where 
+			tb_sys_user_role.user_id=#{userId}
+	</delete>
+	
+</mapper>
